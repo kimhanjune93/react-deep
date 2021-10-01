@@ -6,6 +6,7 @@ import {
   browserSessionPersistence,
   setPersistence,
   onAuthStateChanged,
+  signOut,
 } from "firebase/auth";
 import { createAction, handleActions } from "redux-actions";
 import { produce } from "immer";
@@ -129,6 +130,14 @@ const loginCheckFB = () => {
   };
 };
 
+const logoutFB = () => {
+  return function (dispatch, getState,{history}) {
+    signOut(auth).then(() => {
+      dispatch(logOut());
+      history.replace("/");
+    })
+  }
+}
 //reducer
 export default handleActions(
   {
@@ -156,5 +165,6 @@ const actionCreators = {
   signupFB,
   loginFB,
   loginCheckFB,
+  logoutFB,
 };
 export { actionCreators };

@@ -6,6 +6,7 @@ import { actionCreators as userActions } from "../redux/modules/user";
 
 import {history} from "../redux/configureStore";
 import { apiKey } from "./firebase";
+import Permit from "./Permit";
 const Header = (props) => {
   const is_login = useSelector((state) => state.user.is_login);
   const dispatch = useDispatch();
@@ -14,8 +15,12 @@ const Header = (props) => {
   const is_session = sessionStorage.getItem(_session_key) ? true : false;
 
   console.log(is_session);
-  if (is_login && is_session) {
-    return (
+  // if (is_login && is_session) {
+  //   return (
+      
+  //   );
+  // }
+  <Permit>
       <React.Fragment>
         <Grid is_flex padding="4px 16px">
           <Grid is_flex>
@@ -42,15 +47,13 @@ const Header = (props) => {
               border="1px solid black"
               text="로그아웃"
               _onClick={()=>{
-                dispatch(userActions.logOut({}));
+                dispatch(userActions.logoutFB());
               }}
             ></Button>
           </Grid>
         </Grid>
       </React.Fragment>
-    );
-  }
-
+  </Permit>
   return (
     <React.Fragment>
       <Grid is_flex padding="4px 16px">
