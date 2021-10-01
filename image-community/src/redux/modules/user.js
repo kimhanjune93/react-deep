@@ -1,4 +1,12 @@
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithEmailAndPassword,
+  browserSessionPersistence,
+  setPersistence,
+  onAuthStateChanged,
+} from "firebase/auth";
 import { createAction, handleActions } from "redux-actions";
 import { produce } from "immer";
 import { setCookie, getCookie, deleteCookie } from "../../shared/Cookie";
@@ -27,11 +35,33 @@ const user_initial = {
 };
 
 //middleware actions
-const loginAction = (user) => {
+const loginFB = (id, pwd) => {
   return function (dispatch, getState, { history }) {
-    console.log(history);
-    dispatch(setUser(user));
-    history.push("/");
+    const auth = getAuth();
+    setPersistence(auth, browserSessionPersistence).then((res) => {
+      signInWithEmailAndPassword(auth, id, pwd)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          dispatch(
+            setUser({
+              user_name: user.displayName,
+              id: id,
+              user_profile: "",
+              uid: user.uid,
+            })
+          );
+          // ...
+          history.push("/");
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+
+          console.log(errorCode, errorMessage);
+        });
+    });
   };
 };
 
@@ -45,18 +75,29 @@ const signupFB = (id, pwd, user_name) => {
         console.log(user);
 
         updateProfile(auth.currentUser, {
-            displayName: user_name
-          }).then(() => {
+          displayName: user_name,
+        })
+          .then(() => {
             // Profile updated!
             // ...
-          }).catch((error) => {
+          })
+          .catch((error) => {
             // An error occurred
             // ...
-          }).then(()=>{
-              dispatch(setUser({user_name : user_name, id:id,user_profile:''}));
-              history.push('/');
-          }).catch((error)=> {
-              console.log(error);
+          })
+          .then(() => {
+            dispatch(
+              setUser({
+                user_name: user_name,
+                id: id,
+                user_profile: "",
+                uid: user.uid,
+              })
+            );
+            history.push("/");
+          })
+          .catch((error) => {
+            console.log(error);
           });
       })
       .catch((error) => {
@@ -66,6 +107,25 @@ const signupFB = (id, pwd, user_name) => {
 
         console.log(errorCode, errorMessage);
       });
+  };
+};
+
+const loginCheckFB = () => {
+  return function (dispatch, getState, { history }) {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        dispatch(
+          setUser({
+            user_name: user.displayName,
+            user_profile: "",
+            id: user.email,
+            uid: user.uid,
+          })
+        );
+      } else {
+        dispatch(logOut());
+      }
+    });
   };
 };
 
@@ -93,7 +153,8 @@ export default handleActions(
 const actionCreators = {
   logOut,
   getUser,
-  loginAction,
   signupFB,
+  loginFB,
+  loginCheckFB,
 };
 export { actionCreators };

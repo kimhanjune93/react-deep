@@ -8,15 +8,16 @@ import "firebase/compat/auth";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 const firebaseConfig = {
-  //config데이터 가림
+    //config데이터 가림
 };
 
 // Initialize Firebase
 // const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
-
+const apiKey =firebaseConfig.apiKey;
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-export {auth};
+export {auth, apiKey};
