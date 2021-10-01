@@ -1,7 +1,11 @@
 import React from "react";
 import { Input, Text, Grid, Button } from "../elements";
 import {getCookie, setCookie, deleteCookie} from "../shared/Cookie";
+import { useDispatch } from "react-redux";
+import {actionCreators as userActions} from "../redux/modules/user"
+
 const Login = (props) => {
+  const dispatch = useDispatch();
   const [id,setId] = React.useState('');
   const [pwd,setPwd] = React.useState('');
   const changeId= (e) => {
@@ -13,9 +17,8 @@ const Login = (props) => {
   }
 
   const login =() => {
-    setCookie("USER_ID",id,3);
-    setCookie("USER_PWD",pwd,3);
-  }
+    dispatch(userActions.loginAction({user_name : 'perl'}));
+  };
 
   return (
     <React.Fragment>

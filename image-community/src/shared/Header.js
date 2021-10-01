@@ -1,19 +1,12 @@
 import React from "react";
+import {useDispatch,useSelector} from "react-redux";
 import { Grid, Button, Text } from "../elements";
 import {getCookie, deleteCookie} from "../shared/Cookie";
+import { actionCreators as userActions } from "../redux/modules/user";
+
 const Header = (props) => {
-  const [is_login, setIsLogin] = React.useState(false);
-
-  React.useEffect(()=>{
-    let cookie = getCookie("USER_ID");
-    console.log(cookie);
-
-    if(cookie) {
-      setIsLogin(true);
-    } else {
-      setIsLogin(false);
-    }
-  });
+  const is_login = useSelector((state) => state.user.is_login);
+  const dispatch = useDispatch();
   if (is_login) {
     return (
       <React.Fragment>
@@ -41,7 +34,9 @@ const Header = (props) => {
               fontColor="#212121"
               border="1px solid black"
               text="로그아웃"
-              _onClick={()=>{deleteCookie("USER_ID");}}
+              _onClick={()=>{
+                dispatch(userActions.logOut({}));
+              }}
             ></Button>
           </Grid>
         </Grid>
