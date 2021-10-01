@@ -4,7 +4,6 @@ import {getCookie, setCookie, deleteCookie} from "../shared/Cookie";
 const Login = (props) => {
   const [id,setId] = React.useState('');
   const [pwd,setPwd] = React.useState('');
-  console.log(getCookie('USER_ID'));
   const changeId= (e) => {
     setId(e.target.value);
   }
