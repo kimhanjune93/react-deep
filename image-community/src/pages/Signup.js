@@ -9,12 +9,16 @@ const Signup = () => {
   const [pwd, setPwd] = React.useState("");
   const [pwd_check, setPwdCheck] = React.useState("");
   const [user_name, setUserName] = React.useState("");
-
+  const rexEmail=/^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
   const signup = () => {
     if (id === "" || pwd === "" || user_name === "") {
       return;
     }
     if (pwd !== pwd_check) {
+      return;
+    }
+    if(!id.match(rexEmail)){
+      window.alert("아이디를 이메일 형식으로 입력해주세요")
       return;
     }
 

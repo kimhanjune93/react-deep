@@ -10,13 +10,7 @@ import "firebase/compat/auth";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD7D3dUbVUBorEJnoStCksTpIHkDH_kVeM",
-    authDomain: "image-community-adbcc.firebaseapp.com",
-    projectId: "image-community-adbcc",
-    storageBucket: "image-community-adbcc.appspot.com",
-    messagingSenderId: "683155189033",
-    appId: "1:683155189033:web:2c57b8b9e956b391161b38",
-    measurementId: "G-BX4HKLEXBR"
+    // firebase 컨피그데이터 암호화!
 };
 
 // Initialize Firebase

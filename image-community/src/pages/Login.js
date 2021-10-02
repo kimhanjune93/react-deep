@@ -8,10 +8,14 @@ const Login = (props) => {
   const dispatch = useDispatch();
   const [id,setId] = React.useState('');
   const [pwd,setPwd] = React.useState('');
-
+  const rexEmail=/^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
   const login =() => {
     if(id==="" || pwd==="") {
       window.alert("아이디 혹은 비밀번호가 공란입니다. 입력해주세요");
+      return;
+    }
+    if(!id.match(rexEmail)){
+      window.alert("아이디를 이메일 형식으로 입력해주세요")
       return;
     }
     dispatch(userActions.loginFB(id, pwd));
