@@ -38,8 +38,7 @@ function App() {
       </Grid>
       <Permit>
         <Button is_float text = "+" _onClick ={()=> {
-          console.log("aaaa");
-          history.push("/posting");
+          history.push("/write");
         }} />
       </Permit>
     </React.Fragment>
