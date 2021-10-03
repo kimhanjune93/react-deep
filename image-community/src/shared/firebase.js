@@ -2,6 +2,7 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import {getFirestore} from "firebase/firestore";
+import "firebase/compat/storage";
 // import "firebase/compat/firestore";  //8버전
 // import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
@@ -22,6 +23,6 @@ const apiKey =firebaseConfig.apiKey;
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = getFirestore();
+const storage = firebase.storage();
 
-
-export {auth, apiKey, db};
+export {auth, apiKey, db, storage};
