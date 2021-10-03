@@ -1,6 +1,8 @@
 // Import the functions you need from the SDKs you need
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
+import {getFirestore} from "firebase/firestore";
+// import "firebase/compat/firestore";  //8버전
 // import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -19,5 +21,7 @@ const firebaseConfig = {
 const apiKey =firebaseConfig.apiKey;
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = getFirestore();
 
-export {auth, apiKey};
+
+export {auth, apiKey, db};
