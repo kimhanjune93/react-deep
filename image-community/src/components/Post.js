@@ -17,7 +17,7 @@ const Post = (props) => {
                     <Text>{props.contents}</Text>
                 </Grid>
                 <Grid>
-                    <Image shape = "rectangle" src = {props.src}/>
+                    <Image shape = "rectangle" src = {props.image_url}/>
                 </Grid>
                 <Grid padding = "16px">
                     <Text margin ="0px" bold>댓글 {props.comment_cnt}개</Text>
@@ -32,7 +32,7 @@ Post.defaultProps = {
         user_name: "june",
         user_profile : "https://newsimg.hankookilbo.com/cms/articlerelease/2017/01/22/201701222050082111_1.jpg",
     },
-    image_url : "https://newsimg.hankookilbo.com/cms/articlerelease/2017/01/22/201701222050082111_1.jpg",
+    image_url : "",
     contents : "지방이네요",
     comment_cnt : 10,
     insert_dt : "2021-09-30 10:00:00"

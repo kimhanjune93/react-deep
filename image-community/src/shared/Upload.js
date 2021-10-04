@@ -10,11 +10,20 @@ const Upload = () => {
     const is_uploading = useSelector(state=>state.image.uploading);
     const fileInput = React.useRef();
     const selectFile = (e) => {
-        console.log(e);
-        console.log(e.target);
-        console.log(e.target.files[0]);
+        // console.log(e);
+        // console.log(e.target);
+        // console.log(e.target.files[0]);
 
-        console.log(fileInput.current.files[0]);
+        // console.log(fileInput.current.files[0]);
+
+        const reader = new FileReader();
+        const file = fileInput.current.files[0];
+        
+        reader.readAsDataURL(file);
+
+        reader.onloadend = () => {
+            dispatch(imageActions.setPreview(reader.result));
+        }
     };
     const uploadFB = () => {
         let image = fileInput.current.files[0];

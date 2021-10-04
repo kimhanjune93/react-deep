@@ -14,6 +14,7 @@ import {useDispatch} from "react-redux";
 import {actionCreators as userActions} from "../redux/modules/user";
 import {apiKey} from "./firebase";
 import Permit from "./Permit";
+// import Search from "./Search";
 
 function App() {
   const dispatch = useDispatch();
@@ -34,6 +35,7 @@ function App() {
           <Route path="/signup" exact component={Signup}/>
           <Route path="/write" exact component={PostWrite}/>
           <Route path="/post/:id" exact component={PostDetail}/>
+          {/* <Route path = "/search" exact component={Search}/> */}
         </ConnectedRouter>
       </Grid>
       <Permit>
