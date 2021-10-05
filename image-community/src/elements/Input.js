@@ -3,13 +3,13 @@ import React from "react";
 import {Grid, Text} from "./index";
 import styled from "styled-components";
 const Input =(props)=> {
-    const {multiLine,placeholder, label, _onChange, type} = props;
+    const {multiLine,placeholder, label, _onChange, type, value} = props;
 
     if(multiLine) {
         return (
             <Grid>
                 <Text margin="0px">{label}</Text>
-                <ElTextarea placeholder={placeholder} onChange={_onChange} rows={5}></ElTextarea>
+                <ElTextarea placeholder={placeholder} onChange={_onChange} rows={5} value={value}></ElTextarea>
             </Grid>
         )
     }
@@ -27,6 +27,7 @@ Input.defaultProps = {
     label : '',
     placeholder : '텍스트를 입력해주세요',
     type : "text",
+    value:"",
     _onChange:() => {},
 }
 

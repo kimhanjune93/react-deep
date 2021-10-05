@@ -23,16 +23,23 @@ const Image = (props) => {
 
     return (
         <React.Fragment>
+            <ImageDefault {...styles}/>
         </React.Fragment>
     )
 }
 
 Image.defaultProps={
-    shape : "circle",
+    shape : "",
     src : "https://newsimg.hankookilbo.com/cms/articlerelease/2017/01/22/201701222050082111_1.jpg",
     size : 36,
 }
-
+const ImageDefault = styled.div`
+    --size : ${(props)=> props.size}px;
+    width: var(--size);
+    height: var(--size);
+    background-image : url("${(props)=>props.src}");
+    background-size : cover;
+`;
 const AspectOutter = styled.div`
     width : 100%;
     min-width : 250px;

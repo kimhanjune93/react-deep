@@ -31,6 +31,9 @@ const Header = (props) => {
             fontColor="#212121"
             border="1px solid black"
             text="알림"
+            _onClick={() => {
+              history.push("/noti");
+            }}
           ></Button>
           <Button
             btnColor="#eee"
