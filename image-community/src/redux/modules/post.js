@@ -1,5 +1,11 @@
 import { createAction, handleActions } from "redux-actions";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { produce } from "immer";
 import moment from "moment";
 import { db } from "../../shared/firebase";
@@ -10,9 +16,11 @@ import { actionCreators as imageActions } from "./image";
 // import { collection, doc, setDoc } from "firebase/firestore";
 const SET_POST = "SET_POST";
 const ADD_POST = "ADD_POST";
+const EDIT_POST = "EDIT_POST";
 
 const setPost = createAction(SET_POST, (post_list) => ({ post_list }));
 const addPost = createAction(ADD_POST, (post) => ({ post }));
+const editPost = createAction(EDIT_POST, (post_id, post) => ({post_id, post}));
 
 const initialState = {
   list: [],
@@ -30,6 +38,48 @@ const initialPostState = {
   comment_cnt: 0,
   insert_dt: moment().format("YYYY-MM-DD hh:mm:ss"),
 };
+const editPostFB = (post_id = null, post = {}) => {
+  return async function (dispatch, getState, { history }) {
+    if (!post_id) {
+      console.log("게시물 정보가 없습니다.");
+      return;
+    }
+    const _image = getState().image.preview;
+    const _post_idx = getState().post.list.findIndex((p) => p.id === post_id);
+    const _post = getState().post.list[_post_idx];
+    
+    const postDB = doc(db, "post", post_id);
+    if (_image === _post.image_url) {
+        await updateDoc(postDB, post)
+        dispatch(editPost(post_id, post));
+        history.replace("/");
+    }
+    else {
+      const user_id = getState().user.user.uid;
+      const _upload = storage
+        .ref(`images/${user_id}_${new Date().getTime()}`)
+        .putString(_image, "data_url");
+      _upload.then((snapshot) => {
+        /////////3
+        snapshot.ref
+          .getDownloadURL()
+          .then((url) => {
+            return url;
+          })
+          .then((url) => {
+            ///////4
+            updateDoc(postDB, { ...post, image_url: url })
+              dispatch(editPost(post_id, { ...post, image_url: url }));
+              history.replace("/");
+          }) ////////3
+          .catch((err) => {
+            window.alert("이미지 업로드에 문제가 있어요");
+            console.log("이미지 업로드에 문제가 있어요".err);
+          });
+      });
+    }
+  };
+};
 
 const addPostFB = (contents = "") => {
   return function (dispatch, getState, { history }) {
@@ -37,7 +87,7 @@ const addPostFB = (contents = "") => {
     const user_info = {
       ////// 1
       user_name: _user.user_name,
-      user_id: _user.id,
+      user_id: _user.uid,
       user_profile: _user.user_profile,
     }; ///////  1
     const _post = {
@@ -88,7 +138,6 @@ const addPostFB = (contents = "") => {
         window.alert("이미지 업로드에 문제가 있어요");
         console.log("이미지 업로드에 문제가 있어요".err);
       });
-    return;
     //
     // const docRef = await addDoc(collection(db, "post"), {
     //   ...user_info,
@@ -163,6 +212,12 @@ export default handleActions(
         // 제일 앞에 넣기위해 unshift   (push로 넣게되면 제일 뒤에 들어감.)
         draft.list.unshift(action.payload.post);
       }),
+    [EDIT_POST]: (state, action) =>
+      produce(state, (draft) => {
+        let idx = draft.list.findIndex((p) => p.id === action.payload.post_id);
+        console.log(action);
+        draft.list[idx] = { ...draft.list[idx], ...action.payload.post };
+      }),
   },
   initialState
 );
@@ -170,8 +225,10 @@ export default handleActions(
 const actionCreators = {
   setPost,
   addPost,
+  editPost,
   getPostFB,
   addPostFB,
+  editPostFB,
 };
 
 export { actionCreators };
