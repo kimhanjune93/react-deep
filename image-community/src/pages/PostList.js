@@ -15,7 +15,7 @@ const PostList = (props) => {
   const { history } = props;
   console.log(is_loading);
   React.useEffect(() => {
-    if (post_list.length === 0) {
+    if (post_list.length <2) {
       dispatch(postActions.getPostFB());
     }
   }, []);
