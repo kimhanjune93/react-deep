@@ -1,7 +1,8 @@
 import { createAction, handleActions } from "redux-actions";
 import { produce } from "immer";
 import { db } from "../../shared/firebase";
-import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, where, orderBy, getDocs, addDoc ,updateDoc, doc,increment} from "firebase/firestore";
+import {actionCreators as postActions} from "./post";
 import "moment";
 import moment from "moment";
 
@@ -25,7 +26,33 @@ const initialState = {
   list: {},
   is_loading: false,
 };
+const addCommentFB = (post_id=null, contents) => {
+    return async function (dispatch, getState, {history}) {
+        const user_info = getState().user.user;
 
+        const post= getState().post.list.find(l=>l.id ===post_id);
+        let comment = {
+            post_id: post_id,
+            user_id: user_info.uid,
+            user_name: user_info.user_name,
+            user_profile: user_info.user_profile,
+            contents : contents,
+            insert_dt : moment().format("YYYY-MM-DD hh:mm:ss"),
+        }
+        
+        const docRef = await addDoc(collection(db, "comment"),comment);
+        console.log(docRef.id);
+        comment={...comment, id:docRef.id};
+        const _post = await updateDoc(doc(db,"post",post_id), {
+            comment_cnt: increment(1),
+        });
+        dispatch(addComment(post_id, comment));
+
+        if(post) {
+            dispatch(postActions.editPost(post_id,{comment_cnt: parseInt(post.comment_cnt) + 1}));
+        }
+    }
+}
 const getCommentFB = (post_id = null) => {
   return async function (dispatch, getState, { history }) {
     try {
@@ -59,7 +86,9 @@ export default handleActions(
         //let data ={[post_id : com_list, ...]}
         draft.list[action.payload.post_id] = action.payload.comment_list;
     }),
-    [ADD_COMMENT]: (state, action) => produce(state, (draft) => {}),
+    [ADD_COMMENT]: (state, action) => produce(state, (draft) => {
+        draft.list[action.payload.post_id].unshift(action.payload.comment);
+    }),
     [LOADING]: (state, action) =>
       produce(state, (draft) => {
         draft.is_loading = action.payload.is_loading;
@@ -70,6 +99,7 @@ export default handleActions(
 
 const actionCreators = {
   getCommentFB,
+  addCommentFB,
   setComment,
   addComment,
 };

@@ -29,7 +29,7 @@ const Login = (props) => {
         </Text>
         <Grid padding="16px 0px">
           <Input
-            value={pwd}
+            value={id}
             label="아이디"
             placeholder="아이디를 입력해주세요."
             _onChange={(e)=> {
