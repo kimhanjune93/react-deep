@@ -220,7 +220,7 @@ export default handleActions(
       produce(state, (draft) => {
         draft.list.push(...action.payload.post_list);
         draft.paging = action.payload.paging;
-        draft.loading = false;
+        draft.is_loading = false;
       }),
     [ADD_POST]: (state, action) =>
       produce(state, (draft) => {
