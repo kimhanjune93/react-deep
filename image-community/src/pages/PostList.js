@@ -55,13 +55,13 @@ const PostList = (props) => {
                 >
                   <Post {...p} />
                 </Grid>
-              );
+              )
             }
           })}
         </InfinityScroll>
       </Grid>
     </React.Fragment>
   );
-};
+}
 
 export default PostList;

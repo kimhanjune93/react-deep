@@ -1,5 +1,8 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import LogoutIcon from '@mui/icons-material/Logout';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import LoginIcon from '@mui/icons-material/Login';
 import { Grid, Button, Text } from "../elements";
 import { actionCreators as userActions } from "../redux/modules/user";
 import { apiKey } from "./firebase";
@@ -20,7 +23,7 @@ const Header = (props) => {
               하이
             </Text>
           </Grid>
-          <Grid is_flex>
+          <Grid is_flex width="15%">
             {/* <Button
               btnColor="#eee"
               fontColor="#212121"
@@ -36,12 +39,16 @@ const Header = (props) => {
               history.push("/noti");
             }}
           ></Button> */}
-            <NotiBadge
+            <NotiBadge                 //noti버튼
               _onClick={() => {
                 history.push("/noti");
               }}
             />
-            <Button
+            <LogoutIcon
+            onClick={() => {
+              dispatch(userActions.logoutFB());
+            }}/>
+            {/* <Button
               btnColor="#eee"
               fontColor="#212121"
               border="1px solid black"
@@ -49,7 +56,7 @@ const Header = (props) => {
               _onClick={() => {
                 dispatch(userActions.logoutFB());
               }}
-            ></Button>
+            ></Button> */}
           </Grid>
         </Grid>
       </React.Fragment>
@@ -63,8 +70,8 @@ const Header = (props) => {
             하이
           </Text>
         </Grid>
-        <Grid is_flex>
-          <Button
+        <Grid is_flex width ="15%">
+          {/* <Button
             btnColor="#eee"
             fontColor="#212121"
             border="1px solid black"
@@ -72,8 +79,11 @@ const Header = (props) => {
             _onClick={() => {
               history.push("/login");
             }}
-          ></Button>
-          <Button
+          ></Button> */}
+          <LoginIcon onClick={() => {
+              history.push("/login");
+            }}/>
+          {/* <Button
             btnColor="#eee"
             fontColor="#212121"
             border="1px solid black"
@@ -81,7 +91,10 @@ const Header = (props) => {
             _onClick={() => {
               history.push("/signup");
             }}
-          ></Button>
+          ></Button> */}
+          <PersonAddIcon onClick={() => {
+              history.push("/signup");
+            }}/>
         </Grid>
       </Grid>
     </React.Fragment>

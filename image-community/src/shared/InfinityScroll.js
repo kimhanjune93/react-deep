@@ -32,7 +32,7 @@ const InfinityScroll = (props) => {
     },[is_next, loading])
     return (
         <React.Fragment>
-            {props.children};
+            {props.children}
             {is_next && <Spinner/>}
         </React.Fragment>
     )

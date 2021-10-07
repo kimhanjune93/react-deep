@@ -2,8 +2,12 @@
 import React from "react";
 import { Grid, Image, Text, Button } from "../elements";
 import {history} from "../redux/configureStore";
-
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import EditIcon from '@mui/icons-material/Edit';
 const Post = (props) => {
+  const [is_list, setIsLike] = React.useState(false);  
+  
   return (
     <React.Fragment>
       <Grid>
@@ -15,17 +19,10 @@ const Post = (props) => {
           <Grid is_flex width="auto">
             <Text>{props.insert_dt}</Text>
             {props.is_me && (
-              <Button
-                text="수정"
-                padding="4px"
-                margin="4px"
-                width="auto"
-                fontColor="#212121"
-                btnColor="#eee"
-                _onClick={() => {
-                    history.push(`/write/${props.id}`);
-                }}
-              />
+              <EditIcon
+              _onClick={() => {
+                history.push(`/write/${props.id}`);
+            }}/>
             )}
           </Grid>
         </Grid>
@@ -39,6 +36,7 @@ const Post = (props) => {
           <Text margin="0px" bold>
             댓글 {props.comment_cnt}개
           </Text>
+          {}
         </Grid>
       </Grid>
     </React.Fragment>
