@@ -4,6 +4,7 @@ import { Grid, Button, Text } from "../elements";
 import { actionCreators as userActions } from "../redux/modules/user";
 import { apiKey } from "./firebase";
 import { history } from "../redux/configureStore";
+import NotiBadge from "../components/NotiBadge";
 
 const Header = (props) => {
   const dispatch = useDispatch();
@@ -13,20 +14,20 @@ const Header = (props) => {
   if (is_session && is_login) {
     return (
       <React.Fragment>
-      <Grid is_flex padding="4px 16px">
-        <Grid is_flex>
-          <Text size="24px" margin="0px" bold>
-            하이
-          </Text>
-        </Grid>
-        <Grid is_flex>
-          <Button
-            btnColor="#eee"
-            fontColor="#212121"
-            border="1px solid black"
-            text="내정보"
-          ></Button>
-          <Button
+        <Grid is_flex padding="4px 16px">
+          <Grid is_flex>
+            <Text size="24px" margin="0px" bold>
+              하이
+            </Text>
+          </Grid>
+          <Grid is_flex>
+            {/* <Button
+              btnColor="#eee"
+              fontColor="#212121"
+              border="1px solid black"
+              text="내정보"
+            ></Button> */}
+            {/* <Button
             btnColor="#eee"
             fontColor="#212121"
             border="1px solid black"
@@ -34,19 +35,24 @@ const Header = (props) => {
             _onClick={() => {
               history.push("/noti");
             }}
-          ></Button>
-          <Button
-            btnColor="#eee"
-            fontColor="#212121"
-            border="1px solid black"
-            text="로그아웃"
-            _onClick={() => {
-              dispatch(userActions.logoutFB());
-            }}
-          ></Button>
+          ></Button> */}
+            <NotiBadge
+              _onClick={() => {
+                history.push("/noti");
+              }}
+            />
+            <Button
+              btnColor="#eee"
+              fontColor="#212121"
+              border="1px solid black"
+              text="로그아웃"
+              _onClick={() => {
+                dispatch(userActions.logoutFB());
+              }}
+            ></Button>
+          </Grid>
         </Grid>
-      </Grid>
-    </React.Fragment>
+      </React.Fragment>
     );
   }
   return (

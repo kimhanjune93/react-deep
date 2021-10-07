@@ -4,6 +4,7 @@ import "firebase/compat/auth";
 import {getFirestore} from "firebase/firestore";
 import "firebase/compat/storage";
 import dotenv from "dotenv";
+import "firebase/compat/database";
 dotenv.config();
 // import "firebase/compat/firestore";  //8버전
 // import { initializeApp } from "firebase/app";
@@ -33,5 +34,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = getFirestore();
 const storage = firebase.storage();
+const realtime = firebase.database();
 
-export {auth, apiKey, db, storage};
+export {auth, apiKey, db, storage, realtime};

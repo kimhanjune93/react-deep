@@ -1,6 +1,6 @@
 import { createAction, handleActions } from "redux-actions";
 import { produce } from "immer";
-import { db } from "../../shared/firebase";
+import { db, realtime } from "../../shared/firebase";
 import { collection, query, where, orderBy, getDocs, addDoc ,updateDoc, doc,increment} from "firebase/firestore";
 import {actionCreators as postActions} from "./post";
 import "moment";
@@ -46,11 +46,29 @@ const addCommentFB = (post_id=null, contents) => {
         const _post = await updateDoc(doc(db,"post",post_id), {
             comment_cnt: increment(1),
         });
+
         dispatch(addComment(post_id, comment));
 
         if(post) {
             dispatch(postActions.editPost(post_id,{comment_cnt: parseInt(post.comment_cnt) + 1}));
         }
+        //알람
+        const _noti_item = realtime.ref(`noti/${post.user_info.user_id}/list`).push();
+
+        _noti_item.set({
+          post_id: post.id,
+          user_name: comment.user_name,
+          image_url : post.image_url,
+          insert_dt: comment.insert_dt,
+        }, (err)=> {
+          if(err){
+            console.log("알림 저장에 실패했어요!");
+          } else {
+            const notiDB = realtime.ref(`noti/${post.user_info.user_id}`);
+
+            notiDB.update({read: false});
+          }
+        })
     }
 }
 const getCommentFB = (post_id = null) => {
