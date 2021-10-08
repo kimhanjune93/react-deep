@@ -39,11 +39,8 @@ const Header = (props) => {
               history.push("/noti");
             }}
           ></Button> */}
-            <NotiBadge                 //noti버튼
-              _onClick={() => {
-                history.push("/noti");
-              }}
-            />
+            <NotiBadge 
+            _onClick ={() => {history.push("/noti");}}/>
             <LogoutIcon
             onClick={() => {
               dispatch(userActions.logoutFB());

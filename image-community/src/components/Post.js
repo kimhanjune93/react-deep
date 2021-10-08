@@ -1,12 +1,36 @@
 //Post.js
 import React from "react";
 import { Grid, Image, Text, Button } from "../elements";
-import {history} from "../redux/configureStore";
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import EditIcon from '@mui/icons-material/Edit';
+import { history } from "../redux/configureStore";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import EditIcon from "@mui/icons-material/Edit";
+import { actionCreators as postActions } from "../redux/modules/post";
+import {useDispatch, useSelector} from "react-redux";
 const Post = (props) => {
-  const [is_list, setIsLike] = React.useState(false);  
+  const dispatch = useDispatch();
+  const post_list = useSelector(store=>store.post.list);
+  const post_idx = post_list.findIndex((p)=> p.id ===props.id);
+  const post = post_list[post_idx];
+  const [is_like, setIsLike] = React.useState(false);
+  const user = useSelector(state => state.user.user);
+  const like = (e) => {
+    dispatch(postActions.addPostLikeFB(props.id));
+    if (is_like===true || !user){
+      setIsLike(false);
+    }
+    else {
+      setIsLike(true);
+    }
+    e.stopPropagation();
+  }
+  React.useEffect(() => {
+    setIsLike(post.is_like);
+  },[post]);
+
+  React.useEffect(()=> {
+    dispatch(postActions.getPostLikeFB(props.id));
+  },[]);
   
   return (
     <React.Fragment>
@@ -20,9 +44,10 @@ const Post = (props) => {
             <Text>{props.insert_dt}</Text>
             {props.is_me && (
               <EditIcon
-              _onClick={() => {
-                history.push(`/write/${props.id}`);
-            }}/>
+                onClick={() => {
+                  history.push(`/write/${props.id}`);
+                }}
+              />
             )}
           </Grid>
         </Grid>
@@ -32,11 +57,17 @@ const Post = (props) => {
         <Grid>
           <Image shape="rectangle" src={props.image_url} />
         </Grid>
-        <Grid padding="16px">
-          <Text margin="0px" bold>
-            댓글 {props.comment_cnt}개
-          </Text>
-          {}
+        <Grid padding="16px" is_flex>
+           <Grid> 
+            <Text margin="0px" bold>
+              댓글 {props.comment_cnt}개
+            </Text>
+          </Grid> 
+           <Grid width = "20%" is_flex> 
+             <Text>좋아요 {post.like_cnt}개</Text> 
+             {is_like===true?<FavoriteIcon onClick = {like}/> : <FavoriteBorderIcon onClick = {like}/>} 
+            
+           </Grid> 
         </Grid>
       </Grid>
     </React.Fragment>

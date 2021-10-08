@@ -3,6 +3,7 @@ import { Badge } from "@material-ui/core";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import {realtime} from "../shared/firebase";
 import {useSelector} from "react-redux";
+import { history } from "../redux/configureStore";
 import { doc } from "@firebase/firestore";
 
 const NotiBadge = (props) => {
@@ -20,7 +21,9 @@ const NotiBadge = (props) => {
 
     notiDB.on("value", (snapshot) => {
         console.log(snapshot.val());
-
+        if(!snapshot.val()) {
+          return;
+        }
         setIsRead(snapshot.val().read);
     });
 

@@ -10,6 +10,7 @@ import Permit from "../shared/Permit";
 const PostDetail = (props) => {
   const id = props.match.params.id;
   const post_list = useSelector((store) => store.post.list);
+  console.log(post_list);
   const user_info = useSelector((state) => state.user.user);
   const post_idx = post_list.findIndex((p) => p.id === id);
   const post = post_list[post_idx];

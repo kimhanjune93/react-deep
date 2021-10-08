@@ -13,9 +13,8 @@ const PostList = (props) => {
   const paging = useSelector((state) => state.post.paging);
 
   const { history } = props;
-  console.log(is_loading);
   React.useEffect(() => {
-    if (post_list.length <2) {
+    if (post_list.length <4) {
       dispatch(postActions.getPostFB());
     }
   }, []);

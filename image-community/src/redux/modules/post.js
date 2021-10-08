@@ -9,7 +9,11 @@ import {
   orderBy,
   limit,
   startAt,
-  getDoc
+  getDoc,
+  where,
+  increment,
+  deleteDoc,
+  decrement,
 } from "firebase/firestore";
 import { produce } from "immer";
 import moment from "moment";
@@ -24,18 +28,21 @@ const ADD_POST = "ADD_POST";
 const EDIT_POST = "EDIT_POST";
 const LOADING = "LOADING";
 
-const setPost = createAction(SET_POST, (post_list,paging) => ({ post_list, paging }));
+const setPost = createAction(SET_POST, (post_list, paging) => ({
+  post_list,
+  paging,
+}));
 const addPost = createAction(ADD_POST, (post) => ({ post }));
 const editPost = createAction(EDIT_POST, (post_id, post) => ({
   post_id,
   post,
 }));
-const loading = createAction(LOADING, (is_loading) => ({is_loading}));
+const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 
 const initialState = {
   list: [],
-  paging: {start: null, next: null, size:3},
-  is_loading : false,
+  paging: { start: null, next: null, size: 3 },
+  is_loading: false,
 };
 const initialPostState = {
   // id: 0,
@@ -48,7 +55,13 @@ const initialPostState = {
     "https://newsimg.hankookilbo.com/cms/articlerelease/2017/01/22/201701222050082111_1.jpg",
   contents: "지방이네요",
   comment_cnt: 0,
+  like_cnt: 0,
+  is_like: false,
   insert_dt: moment().format("YYYY-MM-DD hh:mm:ss"),
+};
+const initialLikeState = {
+  post_id: "",
+  user_id: "",
 };
 const editPostFB = (post_id = null, post = {}) => {
   return async function (dispatch, getState, { history }) {
@@ -165,35 +178,37 @@ const addPostFB = (contents = "") => {
   };
 };
 
-const getPostFB = (start=null, size=3) => {
+const getPostFB = (start = null, size = 3) => {
   return async function (dispatch, getState, { history }) {
-
-    let _paging=getState().post.paging;
-    if(_paging.start && !_paging.next) {
+    let _paging = getState().post.paging;
+    if (_paging.start && !_paging.next) {
       return;
     }
     dispatch(loading(true));
     // const docs = await getDocs(collection(db, "post"));
-    const postDB = collection(db,"post");
-    let q = "" //
-    if(start) {
-      q=query(postDB, orderBy("insert_dt", "desc"),startAt(start), limit(size+1));
+    const postDB = collection(db, "post");
+    let q = ""; //
+    if (start) {
+      q = query(
+        postDB,
+        orderBy("insert_dt", "desc"),
+        startAt(start),
+        limit(size + 1)
+      );
+    } else {
+      q = query(postDB, orderBy("insert_dt", "desc"), limit(size + 1));
     }
-    else {
-      q=query(postDB, orderBy("insert_dt", "desc"), limit(size+1));
-    }
-    
-    
+
     const docs = await getDocs(q);
     let post_list = [];
     let paging = {
-      start : docs.docs[0],
-      next:docs.docs.length === size+1?docs.docs[docs.docs.length-1] : null,
-      size : size,
-    }
+      start: docs.docs[0],
+      next:
+        docs.docs.length === size + 1 ? docs.docs[docs.docs.length - 1] : null,
+      size: size,
+    };
     docs.forEach((doc) => {
       let _post = doc.data();
-      let postArray = Object.keys(_post);
       let post = Object.keys(_post).reduce(
         // reduce 누산기
         (acc, cur) => {
@@ -208,15 +223,18 @@ const getPostFB = (start=null, size=3) => {
         { id: doc.id, user_info: {} }
       );
       post_list.push(post);
+
     });
-    post_list.pop();
+    if(paging.next){
+      post_list.pop();
+    }
     dispatch(setPost(post_list, paging));
   };
 };
 
 const getOnePostFB = (id) => {
-  return async function(dispatch, getState, {history}) {
-    const postDB = doc(db, "post",id);
+  return async function (dispatch, getState, { history }) {
+    const postDB = doc(db, "post", id);
     const postDoc = await getDoc(postDB);
     let _post = postDoc.data();
     let post = Object.keys(_post).reduce(
@@ -233,6 +251,93 @@ const getOnePostFB = (id) => {
       { id: postDoc.id, user_info: {} }
     );
     dispatch(setPost([post]));
+  };
+};
+
+const addPostLikeFB = (post_id) => {
+  return async function (dispatch, getState, { history }) {
+    const user_info = getState().user.user;
+    const post = getState().post.list.find((l) => l.id === post_id);
+    if(!user_info) {
+      return;
+    }
+    let _like = {
+      post_id: post_id,
+      user_id: user_info.uid,
+    };
+    const likeDB = await getDocs(
+      query(
+        collection(db, "like"),
+        where("post_id", "==", post_id),
+        where("user_id", "==", user_info.uid)
+      )
+    );
+    let like_id = "";
+    likeDB.forEach((doc) => {
+      like_id = doc.id;
+    });
+
+    if (likeDB.size === 0) {
+      const docRef = await addDoc(collection(db, "like"), _like);
+      const _post = await updateDoc(doc(db, "post", post_id), {
+        like_cnt: increment(1),
+        is_like : true,
+      });
+      dispatch(
+        editPost(post_id, {
+          like_cnt: parseInt(post.like_cnt) + 1,
+          is_like: true,
+        })
+      );
+    } else {
+      await deleteDoc(doc(db, "like", like_id));
+      const _post = await updateDoc(doc(db, "post", post_id), {
+        like_cnt: increment(-1),
+        is_like : false,
+      });
+      dispatch(
+        editPost(post_id, {
+          like_cnt: parseInt(post.like_cnt) - 1,
+          is_like: false,
+        })
+      );
+    }
+  };
+};
+
+const getPostLikeFB = (post_id) => {
+  return async function (dispatch, getState, { history }) {
+    const user_info = getState().user.user;
+    const post = getState().post.list.find((l) => l.id === post_id);
+    if(!user_info || !post) {
+      return;
+    }
+    const likeDB = await getDocs(
+      query(
+        collection(db, "like"),
+        where("post_id", "==", post_id),
+        where("user_id", "==", user_info.uid)
+      )
+    );
+    let like_id = "";
+    likeDB.forEach((doc) => {
+      like_id = doc.id;
+    });
+
+    if (likeDB.size === 0) {
+      dispatch(
+        editPost(post_id, {
+          is_like: false,
+        })
+      );
+    }
+    else {
+      dispatch(
+        editPost(post_id, {
+          is_like: true,
+        })
+      );
+    }
   }
 }
 //reducer
@@ -242,19 +347,19 @@ export default handleActions(
       produce(state, (draft) => {
         draft.list.push(...action.payload.post_list);
 
-        draft.list= draft.list.reduce((acc, cur)=> {
-          if(acc.findIndex(a=> a.id===cur.id)===-1) {
+        draft.list = draft.list.reduce((acc, cur) => {
+          if (acc.findIndex((a) => a.id === cur.id) === -1) {
             return [...acc, cur];
           } else {
-            acc[acc.findIndex(a=> a.id===cur.id)] = cur;
+            acc[acc.findIndex((a) => a.id === cur.id)] = cur;
             return acc;
           }
         }, []);
 
-        if(action.payload.paging) {
+        if (action.payload.paging) {
           draft.paging = action.payload.paging;
         }
-        
+
         draft.is_loading = false;
       }),
     [ADD_POST]: (state, action) =>
@@ -269,9 +374,10 @@ export default handleActions(
         console.log(action);
         draft.list[idx] = { ...draft.list[idx], ...action.payload.post };
       }),
-    [LOADING] : (state,action) => produce(state,(draft) => {
-      draft.is_loading = action.payload.is_loading;
-    })
+    [LOADING]: (state, action) =>
+      produce(state, (draft) => {
+        draft.is_loading = action.payload.is_loading;
+      }),
   },
   initialState
 );
@@ -284,6 +390,8 @@ const actionCreators = {
   addPostFB,
   editPostFB,
   getOnePostFB,
+  addPostLikeFB,
+  getPostLikeFB,
 };
 
 export { actionCreators };
